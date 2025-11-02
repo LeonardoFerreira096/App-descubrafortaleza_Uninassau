@@ -1,98 +1,218 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+// app/(tabs)/index.tsx - Versão com Hook Customizado
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import LocalCard from '@/components/LocalCard';
+import SearchBar from '@/components/SearchBar';
+import { useLocais } from '@/hooks/useLocais';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { 
+    searchTerm, 
+    setSearchTerm, 
+    locaisFiltrados,
+    filtroCategoria,
+    setFiltroCategoria,
+  } = useLocais();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const categorias = [
+    { id: null, nome: 'Todos', emoji: '🏙️' },
+    { id: 'praia', nome: 'Praias', emoji: '🏖️' },
+    { id: 'cultura', nome: 'Cultura', emoji: '🎭' },
+    { id: 'parque', nome: 'Parques', emoji: '🎢' },
+    { id: 'compras', nome: 'Compras', emoji: '🛍️' },
+  ];
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      
+      {/* Header com Gradiente */}
+      <LinearGradient
+        colors={['#2563eb', '#0891b2']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.header}
+      >
+        <Text style={styles.headerTitle}>🏖️ Descubra Fortaleza</Text>
+        <Text style={styles.headerSubtitle}>
+          Explore os melhores pontos turísticos
+        </Text>
+      </LinearGradient>
+
+      {/* Barra de Busca */}
+      <SearchBar 
+        value={searchTerm}
+        onChangeText={setSearchTerm}
+      />
+
+      {/* Filtros de Categoria */}
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        style={styles.categoriesContainer}
+        contentContainerStyle={styles.categoriesContent}
+      >
+        {categorias.map(cat => (
+          <TouchableOpacity
+            key={cat.id || 'todos'}
+            style={[
+              styles.categoryButton,
+              filtroCategoria === cat.id && styles.categoryButtonActive
+            ]}
+            onPress={() => setFiltroCategoria(cat.id)}
+          >
+            <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
+            <Text style={[
+              styles.categoryText,
+              filtroCategoria === cat.id && styles.categoryTextActive
+            ]}>
+              {cat.nome}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Lista de Locais */}
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {locaisFiltrados.length > 0 ? (
+          <>
+            <Text style={styles.resultCount}>
+              {locaisFiltrados.length} {locaisFiltrados.length === 1 ? 'local encontrado' : 'locais encontrados'}
+            </Text>
+            {locaisFiltrados.map(local => (
+              <LocalCard key={local.id} local={local} />
+            ))}
+          </>
+        ) : (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateEmoji}>🔍</Text>
+            <Text style={styles.emptyStateText}>
+              Nenhum local encontrado
+            </Text>
+            <Text style={styles.emptyStateSubtext}>
+              Tente buscar por outro termo ou categoria
+            </Text>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          🌊 Descubra Fortaleza - Seu guia turístico completo
+        </Text>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    backgroundColor: '#f0fdfa',
   },
-  stepContainer: {
-    gap: 8,
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    paddingTop: 40,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  headerSubtitle: {
+    fontSize: 15,
+    color: '#dbeafe',
+  },
+  categoriesContainer: {
+    maxHeight: 60,
+  },
+  categoriesContent: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  categoryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#e5e7eb',
+    gap: 6,
+  },
+  categoryButtonActive: {
+    backgroundColor: '#2563eb',
+    borderColor: '#2563eb',
+  },
+  categoryEmoji: {
+    fontSize: 18,
+  },
+  categoryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  categoryTextActive: {
+    color: '#fff',
+  },
+  resultCount: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 12,
+    marginLeft: 4,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 20,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  emptyStateEmoji: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    color: '#6b7280',
+  },
+  footer: {
+    backgroundColor: '#1f2937',
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  footerText: {
+    color: '#9ca3af',
+    fontSize: 12,
   },
 });
