@@ -2,16 +2,17 @@
 
 import { Local, getCriminalidadeColor } from '@/constants/Locais';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router'; // ✅ NOVO IMPORT
 import React, { useState } from 'react';
 import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 interface LocalCardProps {
   local: Local;
 }
 
 export default function LocalCard({ local }: LocalCardProps) {
-  const [expandedMap, setExpandedMap] = useState(false);
-
+  const [showMap, setShowMap] = useState(false);
   const criminalidadeColors = getCriminalidadeColor(local.criminalidadeNivel);
 
   const openInMaps = () => {
@@ -23,8 +24,8 @@ export default function LocalCard({ local }: LocalCardProps) {
     <View style={styles.card}>
       {/* Imagem e Título */}
       <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: local.imagem }} 
+        <Image
+          source={{ uri: local.imagem }}
           style={styles.image}
           resizeMode="cover"
         />
@@ -53,10 +54,10 @@ export default function LocalCard({ local }: LocalCardProps) {
             <Ionicons name="shield-checkmark" size={20} color="#4b5563" />
             <Text style={styles.infoTitle}>Segurança</Text>
           </View>
-          <View 
+          <View
             style={[
-              styles.criminalidadeBadge, 
-              { 
+              styles.criminalidadeBadge,
+              {
                 backgroundColor: criminalidadeColors.bg,
                 borderColor: criminalidadeColors.border
               }
@@ -68,14 +69,73 @@ export default function LocalCard({ local }: LocalCardProps) {
           </View>
         </View>
 
-        {/* Botão Ver no Mapa */}
-        <TouchableOpacity 
+        {/* Mapa Incorporado */}
+        <View style={styles.mapContainer}>
+          <TouchableOpacity
+            style={styles.mapToggleButton}
+            onPress={() => setShowMap(!showMap)}
+          >
+            <Ionicons
+              name={showMap ? "chevron-up" : "map-outline"}
+              size={20}
+              color="#2563eb"
+            />
+            <Text style={styles.mapToggleText}>
+              {showMap ? 'Ocultar Mapa' : 'Ver Mapa Aqui'}
+            </Text>
+          </TouchableOpacity>
+
+          {showMap && (
+            <View style={styles.mapWrapper}>
+              <MapView
+                style={styles.map}
+                provider={PROVIDER_GOOGLE}
+                initialRegion={{
+                  latitude: local.localizacao.lat,
+                  longitude: local.localizacao.lng,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+                scrollEnabled={true}
+                zoomEnabled={true}
+              >
+                <Marker
+                  coordinate={{
+                    latitude: local.localizacao.lat,
+                    longitude: local.localizacao.lng,
+                  }}
+                  title={local.nome}
+                  description={local.descricao}
+                  pinColor="#2563eb"
+                />
+              </MapView>
+            </View>
+          )}
+        </View>
+
+        <TouchableOpacity
+          style={styles.detailsButton}
+          onPress={() =>
+            router.push({
+
+              pathname: "/local-details",
+              params: { id: local.id },
+            })
+          }
+        >
+          <Ionicons name="information-circle" size={20} color="#2563eb" />
+          <Text style={styles.detailsButtonText}>Ver Detalhes Completos</Text>
+          <Ionicons name="chevron-forward" size={20} color="#2563eb" />
+        </TouchableOpacity>
+
+        {/* Botão Abrir no Google Maps */}
+        <TouchableOpacity
           style={styles.mapButton}
           onPress={openInMaps}
         >
-          <Ionicons name="map" size={20} color="#fff" />
-          <Text style={styles.mapButtonText}>Ver no Mapa</Text>
           <Ionicons name="navigate" size={20} color="#fff" />
+          <Text style={styles.mapButtonText}>Abrir no Google Maps</Text>
+          <Ionicons name="arrow-forward" size={20} color="#fff" />
         </TouchableOpacity>
 
         {/* Coordenadas */}
@@ -167,6 +227,54 @@ const styles = StyleSheet.create({
   },
   criminalidadeText: {
     fontSize: 14,
+    fontWeight: '600',
+  },
+  mapContainer: {
+    marginBottom: 12,
+  },
+  mapToggleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#eff6ff',
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2563eb',
+  },
+  mapToggleText: {
+    color: '#2563eb',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  mapWrapper: {
+    marginTop: 12,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  map: {
+    width: '100%',
+    height: 250,
+  },
+  detailsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#eff6ff',
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 8,
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: '#2563eb',
+  },
+  detailsButtonText: {
+    color: '#2563eb',
+    fontSize: 16,
     fontWeight: '600',
   },
   mapButton: {
