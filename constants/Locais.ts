@@ -12,7 +12,7 @@ export interface Local {
     lat: number;
     lng: number;
   };
-  categoria?: 'praia' | 'cultura' | 'parque' | 'compras';
+  categoria?: 'praia' | 'cultura' | 'parque' | 'compras' | 'gastronomia';
 }
 
 export const LOCAIS_TURISTICOS: Local[] = [
@@ -70,6 +70,50 @@ export const LOCAIS_TURISTICOS: Local[] = [
     criminalidadeNivel: "medio",
     localizacao: { lat: -3.7474, lng: -38.4562 },
     categoria: "praia"
+  },
+  {
+    id: 6,
+    nome: "Praça da Cidade 2000",
+    imagem: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&h=400&fit=crop",
+    descricao: "Centro gastronômico no bairro Cidade 2000, com diversos restaurantes, lanchonetes e opções de culinária regional. Ponto de encontro para refeições e happy hour.",
+    onibus: ["074 - Cidade 2000", "375 - Messejana/Cidade 2000", "028 - Circular Leste"],
+    criminalidade: "Baixa-Média",
+    criminalidadeNivel: "medio",
+    localizacao: { lat: -3.8021, lng: -38.4874 },
+    categoria: "gastronomia"
+  },
+  {
+    id: 7,
+    nome: "Mercado dos Pinhões",
+    imagem: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&h=400&fit=crop",
+    descricao: "Centro gastronômico tradicional de Fortaleza, famoso pela culinária típica cearense. Destaque para tapioca, carne de sol e frutos do mar.",
+    onibus: ["051 - Circular Centro", "012 - Centro/Aldeota", "073 - Parangaba/Centro"],
+    criminalidade: "Média",
+    criminalidadeNivel: "medio",
+    localizacao: { lat: -3.7304, lng: -38.5267 },
+    categoria: "gastronomia"
+  },
+  {
+    id: 8,
+    nome: "Estátua de Iracema - Lagoa da Messejana",
+    imagem: "https://images.unsplash.com/photo-1578632292335-df3abbb0d586?w=800&h=400&fit=crop",
+    descricao: "Monumento em homenagem à personagem de José de Alencar, localizado às margens da Lagoa da Messejana. Símbolo cultural e ponto turístico do bairro.",
+    onibus: ["051 - Messejana/Centro", "375 - Messejana Circular", "028 - Leste/Centro"],
+    criminalidade: "Baixa-Média",
+    criminalidadeNivel: "medio",
+    localizacao: { lat: -3.8358, lng: -38.4755 },
+    categoria: "cultura"
+  },
+  {
+    id: 9,
+    nome: "Parque do Cocó",
+    imagem: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=400&fit=crop",
+    descricao: "Maior parque urbano da América Latina, com trilhas, ciclovia, fauna e flora nativas. Ótimo para caminhadas e contato com a natureza.",
+    onibus: ["051 - Circular Centro", "027 - Aldeota/Cocó", "078 - Parque Circular"],
+    criminalidade: "Baixa",
+    criminalidadeNivel: "baixa",
+    localizacao: { lat: -3.7614, lng: -38.5037 },
+    categoria: "parque"
   }
 ];
 
